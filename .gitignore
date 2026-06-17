@@ -1,0 +1,23 @@
+*.iml
+.gradle
+/local.properties
+.idea/
+.DS_Store
+# Ignore Gradle build output for every module (root, app, bank-link, …)
+build/
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+.history
+# Release signing — never commit real keystores or their credentials
+keystore.properties
+*.jks
+example/keystores/release.keystore
+# Internal-only notes/backups — not for the public repo
+backup/
+# Agent knowledge base — internal docs for AI-assisted development, not for the public repo
+agent/
+# Internal AI-assist slash commands & skills — not for the public repo
+.claude/commands/
+.claude/skills/
