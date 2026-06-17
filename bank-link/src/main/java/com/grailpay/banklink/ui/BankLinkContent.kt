@@ -90,8 +90,8 @@ internal fun BankLinkContent(
                     state = s,
                     branding = session.branding,
                     clientReferenceId = session.clientReferenceId,
-                    billingMerchantUuid = null,
-                    billingProcessorMid = null,
+                    billingMerchantUuid = session.billingMerchantUuid,
+                    billingProcessorMid = session.billingProcessorMid,
                     // Legacy addJavascriptInterface delivers on a background thread, so marshal every
                     // callback to main before touching the ViewModel. (addWebMessageListener is already
                     // on main — runOnUiThread runs inline there.)

@@ -53,6 +53,8 @@ internal class SessionInitializer(
                 reconnectConnectionId = config.connectionId,
                 appLauncherUrl = config.appLauncherUrl,
                 branding = config.branding,
+                billingMerchantUuid = config.billingMerchantUuid,
+                billingProcessorMid = config.billingProcessorMid,
                 widgetBaseUrl = config.baseUrl,
             )
         }
@@ -101,6 +103,8 @@ internal class SessionInitializer(
             reconnectConnectionId = config.connectionId,
             appLauncherUrl = config.appLauncherUrl,
             branding = config.branding,
+            billingMerchantUuid = config.billingMerchantUuid,
+            billingProcessorMid = config.billingProcessorMid,
             widgetBaseUrl = config.baseUrl,
         )
     }

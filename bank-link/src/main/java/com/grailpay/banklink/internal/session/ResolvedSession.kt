@@ -25,6 +25,8 @@ internal data class ResolvedSession(
     val reconnectConnectionId: String?,
     val appLauncherUrl: String,
     val branding: Branding?,
+    val billingMerchantUuid: String?,
+    val billingProcessorMid: String?,
     // Resolved BankLink host (same one serving the API). The render-only activity loads the
     // widget from here instead of a build-time constant, so one artifact serves every env.
     val widgetBaseUrl: String,
