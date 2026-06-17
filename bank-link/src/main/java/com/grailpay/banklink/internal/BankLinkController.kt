@@ -20,6 +20,7 @@ import com.grailpay.banklink.internal.telemetry.SdkLogger
 import com.grailpay.banklink.internal.time.MerchantTimestamp
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
@@ -99,7 +100,8 @@ internal class BankLinkController {
         // No linkToken until createSession returns; clear any stale one from a prior session.
         NetworkFactory.tokenStore.linkToken = null
 
-        val job = scope.launch {
+        // LAZY + start() after state is set: the non-suspending manual path would otherwise run inline and set Ready before Initializing.
+        val job = scope.launch(start = CoroutineStart.LAZY) {
             val result = runCatching {
                 SessionInitializer(NetworkFactory.api()).initialize(config)
             }
@@ -109,6 +111,7 @@ internal class BankLinkController {
             )
         }
         state = State.Initializing(job, config)
+        job.start()
     }
 
     fun open() {
@@ -247,7 +250,8 @@ internal class BankLinkController {
                 target.block()
             } catch (cancellation: CancellationException) {
                 throw cancellation
-            } catch (t: Throwable) {
+            } catch (_: Exception) {
+                // Exception, not Throwable: a throwing callback shouldn't crash the SDK, but fatal Errors (OOM) still propagate.
                 logger.warn("merchant_callback_threw", mapOf("callback" to JsonPrimitive(callbackName)))
             }
         }

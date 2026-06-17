@@ -99,16 +99,16 @@ val config = BankLinkConfig.Builder("<MERCHANT_BEARER>")
 
 GrailPayBankLink.open(activity, config, object : BankLinkListener {
     override fun onBankConnected(event: BankConnectedEvent) {
-        Log.i("BankLink", "${event.bankAccounts.size} accounts")
+        Log.i("BankLink", "${event.bank_accounts.size} accounts")
     }
     override fun onLinkedDefaultAccount(event: LinkedAccountEvent) {
-        Log.i("BankLink", "default = ${event.bankAccount.accountUuid}")
+        Log.i("BankLink", "default = ${event.bank_account.account_uuid}")
     }
     override fun onLinkExit(event: LinkExitEvent) {
         if (event.status == LinkExitStatus.COMPLETE) proceedToCheckout()
     }
     override fun onError(event: BankLinkError) {
-        Log.e("BankLink", event.errorMessage)
+        Log.e("BankLink", event.error_message)
     }
 })
 ```

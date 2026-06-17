@@ -316,15 +316,26 @@ internal class WidgetBridge(private val listener: WidgetMessageListener) {
                 listener.onWidgetReady()
                 handleReady()
             }
+            // Fail closed: a drifted payload must still end the flow with a terminal callback instead of stalling the user mid-connect.
             "grailpay:bank_connected" -> payload?.let {
                 runCatching { json.decodeFromJsonElement(WireBankConnected.serializer(), it) }
                     .onSuccess(listener::onBankConnected)
-                    .onFailure { SdkLogger.get().error("widget_bank_connected_parse_failed") }
+                    .onFailure {
+                        SdkLogger.get().error("widget_bank_connected_parse_failed")
+                        listener.onWidgetError(
+                            WireError(errorMessage = "The bank connection could not be completed. Please try again."),
+                        )
+                    }
             }
             "grailpay:account_selected" -> payload?.let {
                 runCatching { json.decodeFromJsonElement(WireAccountSelected.serializer(), it) }
                     .onSuccess(listener::onAccountSelected)
-                    .onFailure { SdkLogger.get().error("widget_account_selected_parse_failed") }
+                    .onFailure {
+                        SdkLogger.get().error("widget_account_selected_parse_failed")
+                        listener.onWidgetError(
+                            WireError(errorMessage = "The bank connection could not be completed. Please try again."),
+                        )
+                    }
             }
             // An error event must always reach the merchant and end the flow, so an unparseable
             // payload surfaces a generic error rather than stranding the user with no callback.

@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.grailpay.banklink.sample.BuildConfig
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 private val Context.demoStore by preferencesDataStore("demo")
@@ -17,11 +18,7 @@ class DemoPreferences(private val context: Context) {
 
     suspend fun load(): DemoFormState = store.data
         .map { it.toForm() }
-        .let { flow ->
-            var first: DemoFormState? = null
-            flow.collect { first = it; return@collect }
-            first ?: DemoFormState()
-        }
+        .first()
 
     fun observe(): Flow<DemoFormState> = store.data.map { it.toForm() }
 

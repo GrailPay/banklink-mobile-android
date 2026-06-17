@@ -80,6 +80,10 @@ class BankLinkConfig private constructor(
 
         fun build(): BankLinkConfig {
             require(merchantToken.isNotBlank()) { "merchantToken must not be blank" }
+            // A blank override resolves baseUrl to "" and defers failure to opaque network errors — reject it here.
+            require(testBaseUrl.let { it == null || it.isNotBlank() }) {
+                "testEnvironmentUrl must not be blank when provided"
+            }
             val launcher = appLauncherUrl
             require(!launcher.isNullOrBlank()) {
                 "appLauncherUrl is required (the HTTPS App Link the merchant has registered with autoVerify=true)"

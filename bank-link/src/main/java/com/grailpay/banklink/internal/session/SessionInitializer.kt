@@ -6,6 +6,8 @@ import com.grailpay.banklink.internal.net.BankLinkApi
 import com.grailpay.banklink.internal.net.SessionRequest
 import android.util.Log
 import com.grailpay.banklink.internal.telemetry.SdkLogger
+import kotlinx.coroutines.CancellationException
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
@@ -70,12 +72,21 @@ internal class SessionInitializer(
                     billingProcessorMid = config.billingProcessorMid,
                 ),
             )
+        } catch (e: CancellationException) {
+            // Never swallow cancellation — let the coroutine unwind.
+            throw e
         } catch (e: HttpException) {
             throw SessionInitException(translateHttpError(e))
         } catch (_: IOException) {
             // DNS, connection refused, TLS failure, host unreachable. Web's fetch() rejects with
             // "Failed to fetch" for all of these — keep the message verbatim.
             throw SessionInitException(NETWORK_FAILURE_MESSAGE)
+        } catch (_: SerializationException) {
+            // Malformed/empty body or a missing required field from the converter — surface the documented fallback, not a raw decode error.
+            throw SessionInitException(DEFAULT_HTTP_ERROR)
+        } catch (_: IllegalArgumentException) {
+            // Retrofit/kotlinx can wrap a decode failure as IllegalArgumentException — same fallback.
+            throw SessionInitException(DEFAULT_HTTP_ERROR)
         }
 
         logger.info("session_created")
