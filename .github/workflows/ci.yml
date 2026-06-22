@@ -18,6 +18,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # No git credentials are needed after checkout; avoid persisting the token.
+          persist-credentials: false
 
       # AGP 8.x / Gradle 8.13 must run on JDK 17 (the project still targets Java 11 bytecode).
       - name: Set up JDK 17
@@ -34,7 +37,9 @@ jobs:
       # double the work). connectedAndroidTest (example/src/androidTest) needs an emulator and
       # is intentionally left out of this fast PR check.
       - name: Run unit tests and lint
-        run: ./gradlew --no-daemon --stacktrace testDebugUnitTest lint
+        # --continue runs every requested task even if an earlier one fails, so unit-test and
+        # lint failures both surface in a single run instead of one masking the other.
+        run: ./gradlew --no-daemon --stacktrace --continue testDebugUnitTest lint
 
       - name: Upload test & lint reports
         if: always()
