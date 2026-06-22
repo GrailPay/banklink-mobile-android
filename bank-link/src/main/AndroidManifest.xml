@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!--
+        Package visibility (Android 11+/API 30): the Quiltt connector opens bank OAuth pages in
+        an external browser, and from 6.0.x it preflights with resolveActivity() before launching.
+        Without this <queries> declaration that preflight returns null on API 30+ even when a
+        browser exists, so OAuth fails with "No app available to open URL". Declaring the
+        browsable https VIEW intent makes the browser visible to the resolve check.
+    -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.BROWSABLE" />
+            <data android:scheme="https" />
+        </intent>
+    </queries>
+
+    <application>
+        <activity
+            android:name="com.grailpay.banklink.BankLinkActivity"
+            android:exported="false"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboardHidden"
+            android:theme="@android:style/Theme.DeviceDefault.Light.NoActionBar" />
+    </application>
+
+</manifest>

@@ -1,0 +1,16 @@
+# The SDK no longer needs any environment URLs at build time. It ships ONE artifact and picks
+# its host at runtime: BankLinkConfig.Builder defaults to PRODUCTION and exposes SANDBOX, and the
+# Quiltt connector id is returned per-merchant by the session response. So no env vars are
+# required to build or publish.
+#
+# Two optional values you may still want, depending on what you do:
+
+# 1) Publishing to GitHub Packages — put these in your PERSONAL ~/.gradle/gradle.properties
+#    (never the repo root). gpr.key is a GitHub PAT with write:packages.
+# gpr.user=<your-github-username>
+# gpr.key=<your-write:packages-token>
+
+# 2) Running the EXAMPLE app against the GrailPay-internal QA/staging host (debug builds only).
+#    Put this in local.properties at the repo ROOT (gitignored) — it is read by the example
+#    module and injected via BuildConfig.QA_BASE_URL. Leave it unset to use the production default.
+# QA_BASE_URL=https://your-internal-qa-host.example.com
