@@ -31,6 +31,11 @@ jobs:
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
+        with:
+          # setup-gradle is read-only off the default branch by default, so PR runs never
+          # populate the dependency / build cache and stay cold. Allow writes so each run
+          # seeds the cache and subsequent runs skip the multi-minute download + recompile.
+          cache-read-only: false
 
       # Unit tests and Android Lint for the :bank-link SDK module (where the real test suite
       # lives). connectedAndroidTest (example/src/androidTest) needs an emulator and is
