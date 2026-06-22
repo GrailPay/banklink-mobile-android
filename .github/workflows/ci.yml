@@ -32,13 +32,13 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      # Unit tests for the :bank-link SDK module (where the real test suite lives) plus Android
-      # Lint. connectedAndroidTest (example/src/androidTest) needs an emulator and is intentionally
-      # left out of this fast PR check.
+      # Unit tests and Android Lint for the :bank-link SDK module (where the real test suite
+      # lives). connectedAndroidTest (example/src/androidTest) needs an emulator and is
+      # intentionally left out of this fast PR check.
       - name: Run unit tests and lint
         # --continue runs every requested task even if an earlier one fails, so unit-test and
         # lint failures both surface in a single run instead of one masking the other.
-        run: ./gradlew --no-daemon --stacktrace --continue :bank-link:test lint
+        run: ./gradlew --no-daemon --stacktrace --continue :bank-link:test :bank-link:lint
 
       - name: Upload test & lint reports
         if: always()
