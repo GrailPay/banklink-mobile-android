@@ -29,11 +29,12 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      # Unit tests for every module (:bank-link, :example) plus Android Lint.
-      # connectedAndroidTest (example/src/androidTest) needs an emulator and is intentionally
-      # left out of this fast PR check.
+      # Debug-variant unit tests for every module (:bank-link, :example) plus Android Lint.
+      # testDebugUnitTest skips the redundant release-variant unit tests (identical results,
+      # double the work). connectedAndroidTest (example/src/androidTest) needs an emulator and
+      # is intentionally left out of this fast PR check.
       - name: Run unit tests and lint
-        run: ./gradlew --no-daemon --stacktrace test lint
+        run: ./gradlew --no-daemon --stacktrace testDebugUnitTest lint
 
       - name: Upload test & lint reports
         if: always()
