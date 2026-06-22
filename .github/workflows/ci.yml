@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  push:
+    branches: [master, develop]
+  pull_request:
+
+# Least privilege: the job only reads the repo to test/lint and uploads artifacts via the
+# run's own scope. No write access to repo contents is needed.
+permissions:
+  contents: read
+
+# Cancel in-progress runs for the same ref when a new commit is pushed.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test-and-lint:
+    name: Unit tests & Android Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # No git credentials are needed after checkout; avoid persisting the token.
+          persist-credentials: false
+
+      # AGP 8.x / Gradle 8.13 must run on JDK 17 (the project still targets Java 11 bytecode).
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          # Only trusted push events (master/develop) write the cache; pull requests are
+          # read-only. PRs still restore the cache seeded by those pushes, so they stay warm,
+          # but no PR — including from a fork on this public repo — can write a cache entry
+          # that a later trusted run might restore (cache-poisoning surface).
+          cache-read-only: ${{ github.event_name == 'pull_request' }}
+
+      # Unit tests and Android Lint for the :bank-link SDK module (where the real test suite
+      # lives). connectedAndroidTest (example/src/androidTest) needs an emulator and is
+      # intentionally left out of this fast PR check.
+      - name: Run unit tests and lint
+        # --continue runs every requested task even if an earlier one fails, so unit-test and
+        # lint failures both surface in a single run instead of one masking the other.
+        run: ./gradlew --no-daemon --stacktrace --continue :bank-link:test :bank-link:lint
+
+      - name: Upload test & lint reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reports
+          path: |
+            **/build/reports/
+            **/build/test-results/
+          if-no-files-found: ignore
+          retention-days: 14
