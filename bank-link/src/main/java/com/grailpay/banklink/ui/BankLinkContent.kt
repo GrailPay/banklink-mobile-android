@@ -2,6 +2,7 @@ package com.grailpay.banklink.ui
 
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
@@ -16,7 +17,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -58,7 +58,7 @@ internal fun BankLinkContent(
         }
 
         // Pause stage watchdogs while backgrounded — otherwise leaving mid-flow returns to a spurious timeout.
-        val lifecycleActivity = LocalContext.current as? ComponentActivity
+        val lifecycleActivity = LocalActivity.current as? ComponentActivity
         DisposableEffect(lifecycleActivity, vm) {
             val observer = LifecycleEventObserver { _, event ->
                 when (event) {
@@ -121,7 +121,7 @@ private fun QuilttHost(
     state: BankLinkUiState.QuilttLaunching,
     vm: BankLinkViewModel,
 ) {
-    val activity = LocalContext.current as? ComponentActivity
+    val activity = LocalActivity.current as? ComponentActivity
         ?: error("BankLinkContent must be hosted inside a ComponentActivity")
 
     val bridge = remember(state) {

@@ -2,6 +2,7 @@ package com.grailpay.banklink
 
 import com.google.common.truth.Truth.assertThat
 import org.junit.Assert.assertThrows
+import org.junit.Assume.assumeTrue
 import org.junit.Test
 
 /**
@@ -144,6 +145,8 @@ class BankLinkConfigBuilderTest {
 
     @Test
     fun `debug build allows an http appLauncherUrl`() {
+        // Debug-only contract: the release variant enforces HTTPS, so skip there.
+        assumeTrue(BuildConfig.DEBUG)
         // Release rejects non-HTTPS; debug allows it so 10.0.2.2 / LAN dev hosts work.
         val config = BankLinkConfig.Builder(MERCHANT_TOKEN)
             .appLauncherUrl("http://10.0.2.2:3000/return")
@@ -154,6 +157,8 @@ class BankLinkConfigBuilderTest {
 
     @Test
     fun `debug build honors testEnvironmentUrl and trims trailing slash`() {
+        // Debug-only contract: the release variant locks the host down, so skip there.
+        assumeTrue(BuildConfig.DEBUG)
         val config = validBuilder()
             .testEnvironmentUrl("https://qa.internal.grailpay.com/")
             .build()
