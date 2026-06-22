@@ -8,10 +8,12 @@ plugins {
 }
 
 // Published Maven coordinates: com.grailpay:bank-link:<version>
-// Bump VERSION_NAME for every release. A "-SNAPSHOT" suffix routes to the
-// Central Portal snapshot repo; a plain version routes to a staged release.
+// Version is driven by the `versionName` Gradle property — set by the release workflow from
+// the GitHub release tag (./gradlew :bank-link:publish -PversionName=$TAG). A leading "v" is
+// stripped so v1.2.3 and 1.2.3 both publish as 1.2.3. Falls back to a SNAPSHOT for local
+// builds with no property set.
 group = "com.grailpay"
-version = "0.1.0"
+version = (findProperty("versionName") as String?)?.removePrefix("v") ?: "0.1.0-SNAPSHOT"
 
 // Environment URLs are no longer baked in at build time. The SDK ships ONE artifact and picks
 // its host at runtime: BankLinkConfig.Builder defaults to PRODUCTION and exposes SANDBOX; the
