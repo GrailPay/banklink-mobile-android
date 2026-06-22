@@ -5,6 +5,11 @@ on:
     branches: [master, develop]
   pull_request:
 
+# Least privilege: the job only reads the repo to test/lint and uploads artifacts via the
+# run's own scope. No write access to repo contents is needed.
+permissions:
+  contents: read
+
 # Cancel in-progress runs for the same ref when a new commit is pushed.
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
