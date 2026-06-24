@@ -5,9 +5,9 @@
 ![minSdk](https://img.shields.io/badge/minSdk-26-blue.svg)
 ![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)
 
-This document explains the **Bank Link workflow** and provides step-by-step instructions for integrating the **GrailPay Bank Link SDK** into an Android application and successfully completing the bank-linking process.
+This guide walks through the **Bank Link workflow** and shows you how to integrate the **GrailPay Bank Link SDK** into an Android application, from adding the dependency to handling a completed bank connection.
 
-The Android SDK delivers the same flow as the web SDK — mint a session, run the bank-connect flow, render the GrailPay account-selection UI, and return the linked account details through callbacks.
+The Android SDK mirrors the web SDK end to end: it mints a session, runs the bank-connect flow, presents the GrailPay account-selection UI, and returns the linked account details to your app through a set of callbacks.
 
 ## Requirements
 
@@ -18,9 +18,9 @@ The Android SDK delivers the same flow as the web SDK — mint a session, run th
 
 ## Environment Configuration
 
-There is **one** SDK build for all environments — the environment is chosen at **runtime** on
-the config, not baked in at build time. It defaults to **production**, so most integrations set
-nothing.
+There is a single SDK build for all environments. Rather than being fixed at build time, the
+environment is selected at **runtime** on the config object. It defaults to **production**, so most
+integrations don't need to set it at all.
 
 ```kotlin
 // Production — the default. Nothing to set.
@@ -38,23 +38,23 @@ BankLinkConfig.Builder(token)
 - **Production** — `BankLinkConfig.Environment.PRODUCTION` (default). Use with your **production** Bank Link API key.
 - **Sandbox** — `BankLinkConfig.Environment.SANDBOX`. Use with your **sandbox** Bank Link API key.
 
-> Pair the environment with the matching API key — a sandbox key against `PRODUCTION` (or vice
-> versa) will be rejected by the backend.
+> Always pair the environment with a matching API key. A sandbox key used against `PRODUCTION`
+> (or vice versa) will be rejected by the backend.
 
 ## Integration Steps
 
 ### Step 1: Add the SDK Dependency
 
-The SDK is published to **GitHub Packages**. Even though this repository is public,
-GitHub Packages requires authentication to download artifacts, so you need a GitHub
-token configured before Gradle can resolve the dependency.
+The SDK is published to **GitHub Packages**. Although this repository is public,
+GitHub Packages still requires authentication to download artifacts, so you'll need a GitHub
+token in place before Gradle can resolve the dependency.
 
-**1. Create a GitHub Personal Access Token (classic)** with the **`read:packages`** scope
-(no `repo` scope is needed because this repository is public). If your organization uses
-SSO, authorize the token for the `GrailPay` organization.
+**1. Create a GitHub Personal Access Token (classic)** with the **`read:packages`** scope.
+The `repo` scope is not required, since this repository is public. If your organization uses
+SSO, remember to authorize the token for the `GrailPay` organization.
 
-**2. Store the credentials** in your **personal** `~/.gradle/gradle.properties`
-(never commit these — keep them in your home directory, not the project):
+**2. Store the credentials** in your **personal** `~/.gradle/gradle.properties`.
+Keep these in your home directory and never commit them to the project:
 
 ```properties
 gpr.user=<your-github-username>
@@ -95,7 +95,7 @@ android {
 
 ### Step 2: Register the OAuth-Return App Link
 
-Many banks complete authentication in the system browser and then redirect back to your app. The SDK needs an HTTPS **App Link** so Android can return control to your app after that redirect.
+Many banks complete authentication in the system browser and then redirect back to your app. To hand control back cleanly after that redirect, the SDK relies on an HTTPS **App Link**.
 
 **1. Declare the return activity in `AndroidManifest.xml`:**
 
@@ -297,7 +297,7 @@ All callbacks have empty default implementations — override only the ones you 
 
 ## Bank Link Flow
 
-Once initialized, the SDK opens the Bank Link Widget (a full-screen activity) and guides the user through the following steps:
+Once initialized, the SDK opens the Bank Link Widget as a full-screen activity and guides the user through four stages.
 
 ### Finder Screen
 
